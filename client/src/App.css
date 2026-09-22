@@ -1,0 +1,15 @@
+body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 16px; }
+form, .card { display: grid; gap: 10px; background: #1e293b; padding: 16px; border-radius: 12px; }
+form { margin: 24px 0; }
+input, button { padding: 10px 12px; border-radius: 8px; border: 0; }
+button { background: #38bdf8; cursor: pointer; }
+.grid { display: grid; gap: 16px; }
+.row { display: flex; align-items: center; gap: 8px; }
+.dot, .seg { width: 10px; height: 10px; border-radius: 99px; }
+.seg { width: 8px; height: 24px; border-radius: 2px; }
+.bar { display: flex; gap: 3px; min-height: 24px; }
+.up { background: #22c55e; }
+.down { background: #ef4444; }
+.error { color: #fecaca; }
+a { color: #7dd3fc; }
