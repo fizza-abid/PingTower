@@ -7,7 +7,7 @@ async function main() {
   const mem = await MongoMemoryServer.create();
   process.env.MONGO_URI = mem.getUri();
   process.env.PORT = "5052";
-  process.env.CRON_SECRET = process.env.CRON_SECRET || "change-this-to-a-long-random-string";
+  process.env.CRON_SECRET = process.env.CRON_SECRET || "smoke-secret-0123456789-0123456789-0123456789";
   process.env.ENABLE_LOCAL_CRON = "false";
   await mongoose.disconnect();
   require("../server.js");
@@ -67,6 +67,7 @@ async function main() {
   console.log(JSON.stringify(summary, null, 2));
   console.log("=== END ===");
 
+  await new Promise((resolve) => server.close(resolve));
   await mongoose.disconnect();
   await mem.stop();
   process.exit(0);

@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+client/dist/
+client/dist-ssr/
+
+# Logs and local tooling
+*.log
+coverage/
+.DS_Store
+.vscode/

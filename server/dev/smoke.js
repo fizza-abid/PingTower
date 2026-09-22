@@ -11,7 +11,7 @@ async function main() {
   process.env.MONGO_URI = mem.getUri();
   // Force a unique port so smoke runs don't clash with `npm run dev`.
   process.env.PORT = "5051";
-  process.env.CRON_SECRET = process.env.CRON_SECRET || "change-this-to-a-long-random-string";
+  process.env.CRON_SECRET = process.env.CRON_SECRET || "smoke-secret-0123456789-0123456789-0123456789";
   process.env.ENABLE_LOCAL_CRON = "false";
 
   // Reset cached connection if any from a previous run.
@@ -82,6 +82,7 @@ async function main() {
   console.log("=== SMOKE RESULTS ===");
   console.log(JSON.stringify(results, null, 2));
   console.log("=== END SMOKE RESULTS ===");
+  await new Promise((resolve) => server.close(resolve));
   await mongoose.disconnect();
   await mem.stop();
   process.exit(0);

@@ -10,7 +10,8 @@ async function main() {
   process.env.PORT = "5000";
   process.env.ENABLE_LOCAL_CRON = "false";
   await mongoose.disconnect();
-  require("../server.js");
+  const { start } = require("../server.js");
+  await start();
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
