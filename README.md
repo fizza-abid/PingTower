@@ -36,7 +36,27 @@ Open the Vite URL printed in the client terminal. The client uses a relative
 
 For production, set `NODE_ENV=production`, use a random `CRON_SECRET` of at
 least 32 characters, set `CORS_ORIGIN` to the dashboard origin, and keep
-`ALLOW_PRIVATE_TARGETS=false`. The internal scheduler endpoint is:
+`ALLOW_PRIVATE_TARGETS=false`.
+
+To send down/recovery emails, configure SMTP in `server/.env` and set
+`MAIL_ENABLED=true`. `SMTP_SECURE=true` is normally used with port 465; port 587
+normally uses `SMTP_SECURE=false` with STARTTLS. Example settings:
+
+```dotenv
+MAIL_ENABLED=true
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-smtp-user
+SMTP_PASSWORD=your-smtp-password
+MAIL_FROM=PingTower <alerts@example.com>
+```
+
+SMTP failures are logged and do not prevent check history from being recorded.
+A failed down-alert remains eligible for retry on the next check. Credentials
+must stay in `server/.env` or your deployment secret manager.
+
+The internal scheduler endpoint is:
 
 ```text
 POST /api/internal/run-checks
@@ -49,11 +69,15 @@ replica. If `ENABLE_LOCAL_CRON=true`, run only one scheduler replica.
 ## Checks and build
 
 ```bash
-npm test                 # server unit/integration tests without Mongo
+npm test                 # server unit and mail tests without Mongo
 npm run lint             # client lint
 npm run build            # client production build
+
+# requires a running MongoDB and the integration environment variables
+RUN_INTEGRATION=1 npm run test:integration --workspace server
 ```
 
+GitHub Actions runs the unit, mail, Mongo integration, lint, and build checks.
 The optional `server/dev/smoke*.js` scripts exercise the complete Mongo-backed
 API with `mongodb-memory-server`; they may download a MongoDB binary on their
 first run. A real `MONGO_URI` is used by the application itself.

@@ -84,6 +84,29 @@ if (allowPrivateTargets) {
   );
 }
 
+// Email delivery is opt-in so existing development environments do not need
+// SMTP credentials just to boot. Once MAIL_ENABLED=true, all required transport
+// settings are validated here rather than failing during the first alert.
+const mailEnabled = bool("MAIL_ENABLED", false);
+const smtpHost = str("SMTP_HOST", "");
+const smtpPort = int("SMTP_PORT", 587, { min: 1, max: 65535 });
+const smtpSecure = bool("SMTP_SECURE", smtpPort === 465);
+const smtpUser = str("SMTP_USER", "");
+const smtpPassword = process.env.SMTP_PASSWORD || "";
+const mailFrom = str("MAIL_FROM", smtpUser);
+
+if (mailEnabled) {
+  if (!smtpHost) fail("SMTP_HOST is required when MAIL_ENABLED=true.");
+  if (!mailFrom || !mailFrom.includes("@") || /[\r\n]/.test(mailFrom)) {
+    fail("MAIL_FROM must be a valid sender address when MAIL_ENABLED=true.");
+  }
+  if ((smtpUser && !smtpPassword) || (!smtpUser && smtpPassword)) {
+    fail("SMTP_USER and SMTP_PASSWORD must be provided together.");
+  }
+} else if (isProduction) {
+  console.warn("[config] MAIL_ENABLED=false — monitor alerts will be logged but no emails will be sent.");
+}
+
 module.exports = Object.freeze({
   nodeEnv,
   isProduction,
@@ -112,6 +135,18 @@ module.exports = Object.freeze({
 
   // SSRF guard escape hatch (development only)
   allowPrivateTargets,
+
+  // SMTP alert delivery
+  mailEnabled,
+  smtpHost,
+  smtpPort,
+  smtpSecure,
+  smtpUser,
+  smtpPassword,
+  mailFrom,
+  mailConnectionTimeoutMs: int("MAIL_CONNECTION_TIMEOUT_MS", 10000, { min: 1000, max: 120000 }),
+  mailGreetingTimeoutMs: int("MAIL_GREETING_TIMEOUT_MS", 10000, { min: 1000, max: 120000 }),
+  mailSocketTimeoutMs: int("MAIL_SOCKET_TIMEOUT_MS", 20000, { min: 1000, max: 120000 }),
 
   // Rate limiting for the on-demand check endpoint
   checkRateLimitWindowMs: int("CHECK_RATE_LIMIT_WINDOW_MS", 60_000, { min: 1000 }),

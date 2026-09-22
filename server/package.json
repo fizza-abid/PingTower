@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "test": "node --test"
+    "test": "node --test test/core.test.js test/mail.test.js",
+    "test:integration": "node --test test/integration.test.js"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +20,8 @@
     "express-rate-limit": "^8.7.0",
     "helmet": "^8.3.0",
     "mongoose": "^9.10.1",
-    "node-cron": "^4.6.0"
+    "node-cron": "^4.6.0",
+    "nodemailer": "^10.0.10"
   },
   "devDependencies": {
     "mongodb-memory-server": "^11.3.0",

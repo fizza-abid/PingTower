@@ -87,12 +87,22 @@ async function performProjectCheck(project, { now = new Date() } = {}) {
     project;
 
   if (shouldAlert) {
-    await notifier.notifyDown(updated, {
+    const delivered = await notifier.notifyDown(updated, {
       result,
       now,
       consecutiveFails: next.consecutiveFails,
       failThreshold: config.failThreshold,
     });
+
+    // Do not permanently consume the alert edge when SMTP failed. The next
+    // check can retry delivery while the outage is still active. Disabled mail
+    // is treated as an intentional log-only mode by the notifier.
+    if (!delivered && config.mailEnabled) {
+      await Project.updateOne(
+        { _id: project._id },
+        { $set: { alertSent: false, lastAlertAt: null } }
+      );
+    }
   } else if (recovered) {
     const since = project.lastAlertAt ? now.getTime() - new Date(project.lastAlertAt).getTime() : null;
     await notifier.notifyRecovery(updated, { result, now, outageDurationMs: since });
